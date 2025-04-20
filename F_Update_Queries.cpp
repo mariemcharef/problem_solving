@@ -1,12 +1,15 @@
-#include <bits/stdc++.h>
+#include <iostream>
+#include <string>
+#include<vector>
+#include<set>
+#include<algorithm>
 using namespace std;
-typedef long long ll;
 
-
-void solve() {
-    ll t,n,m;
+int main() {
+    long long t,n,m;
     int d,f;
-    
+    cin >> t;
+    while (t--) {
         cin>>n>>m;
         string s,c;
         cin>>s;
@@ -28,15 +31,8 @@ void solve() {
                 s[j-1]=v[k];
                 k++;
             }
+
         }
         cout<<s<<endl;
-    
-}
-int main() {
-    ios_base::sync_with_stdio(false);
-    cin.tie(nullptr);
-    int t = 1;
-     cin >> t;
-    while (t--) solve();
-    return 0;
+    }
 }
