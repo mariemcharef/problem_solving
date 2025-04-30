@@ -1,7 +1,4 @@
-#include <bits/stdc++.h>
-using namespace std;
-typedef long long ll;
-
+3412. Find Mirror Score of a String
 class TaskManager {
     public:
         set<vector<int>> s;
