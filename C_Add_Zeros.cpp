@@ -29,25 +29,32 @@ bool contains7(ll x) {
     }
     return false;
 }
+map<ll,set<ll>> adj;
+map<ll,bool> visited;
+ll mxN=0;
+void dfs(ll node){
+    visited[node]=1;
+    mxN=max(mxN,node);
+    for(ll index:adj[node]){
+        if(!visited[node+index]){
+            dfs(node+index);
+        }
+    }
+
+}
 
 void solve(){
     ll n, x;
+    adj.clear(), visited.clear();
+    mxN=0;
     cin >> n;
-    map<ll,ll> mp;
-
-    for(int i=1; i<=n; i++){
-        cin >> x;
-        mp[i+x] = i;
-    } 
-    
-    ll current_size = n;
-    int i=0;
-    while(i<122 && mp.count(current_size+1)){
-        current_size += mp[current_size + 1] - 1;  
-        i++;
+    for(int i=0;i<n;i++){
+        cin>>x;
+        adj[x+i].insert(i);
     }
+    dfs(n);
+    cout<<mxN<<endl;
 
-    cout << current_size << "\n";
 }
 
 int main() {

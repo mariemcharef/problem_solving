@@ -8,16 +8,16 @@ ll mod = 1e9 +7;
 
 class DSU {
 public:
-    vector<int> parent, size, nb_edges;
-
+    vector<int> parent, size;
+    vector<set<pair<int,int>>> edges;
     DSU(int n) {
         parent.resize(n+1);
         size.resize(n+1);
-        nb_edges.resize(n+1);
+        edges.resize(n+1);
         for (int i = 0; i <= n; i++) {
             parent[i] = i;
             size[i] = 1;
-            nb_edges[i] = 0;
+
         }
     }
 
@@ -29,14 +29,18 @@ public:
     void unionn(int a, int b) {
         int ra = find(a), rb = find(b);
         if (ra == rb) {
-            nb_edges[ra]++; 
+            edges[ra].insert({min(a,b),max(a,b)});
             return;
         }
         if (size[ra] < size[rb]) swap(ra, rb);
+        if((size[ra] == size[rb]) && ra>rb)swap(ra, rb);
+        edges[ra].insert({min(a,b),max(a,b)});
+        for(auto e:edges[rb]){
+            edges[ra].insert(e);
+        }
+        edges[rb].clear();
         parent[rb] = ra;
         size[ra] += size[rb];
-        nb_edges[ra] += nb_edges[rb];
-        nb_edges[ra]++; 
     }
 };
 
@@ -45,24 +49,26 @@ void solve() {
     int n;
     cin >> n;
     DSU dsu(n);
-
+    ll mx = 0, mn = 0;
     for (int i = 1; i <= n; i++) {
         int x;
         cin >> x;
+       // if( dsu.find(max(x,i))==min(x,i) && dsu.size[min(x,i)] > 2)mn++;
         dsu.unionn(i, x);
+
     }
 
     set<int> parents;
-    long long mx = 0, mn = 0;
+   
     for (int i = 1; i <= n; i++) {
         int pr = dsu.find(i);
         if (parents.insert(pr).second) {
             mx++;
-            if (dsu.nb_edges[pr] == dsu.size[pr] && dsu.size[pr]>2) mn++;
+            if(dsu.edges[pr].size()==dsu.size[pr] && dsu.size[pr]>2)mn++;
         }
     }
-
-    cout << max(1LL, mn) << " " << mx << "\n";
+    if( mn<mx)mn++;
+    cout << mn<< " " << mx << "\n";
 }
 
 
