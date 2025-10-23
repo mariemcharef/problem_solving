@@ -5,78 +5,86 @@ typedef long long ll;
 
 const int N=1e5+2;
 
-class SegTree{
-    public:
+class SegTree {
+public:
     int n;
     vector<int> v;
     vector<ll> tree;
-  vector<ll> lazy, sum;
-  vector<bool> upd;
+    vector<ll> lazy;
 
-    SegTree(int x){
-        n=x;
-        tree.resize(4*n);
-        lazy.assign(4*n, 0);
-        upd.assign(4*n, 0);
-        sum.assign(4*n, 0);
+    SegTree(vector<int> &a) {
+        v = a;
+        n = v.size();
+        tree.assign(4 * n,0);
+        lazy.assign(4 * n,0);
     }
 
-    ll mrg(ll l, ll r){
-        return l+r;
+
+    ll mrg( ll L,  ll R) {
+        return L+R;
     }
-    void unlazy(int id, int ns, int ne) {
-        if (lazy[id] != 0) {
-            tree[id] += lazy[id] * (ne - ns + 1);
-            if (ns != ne) {
-                int l = id*2+1;
-                int r = l+1;
-                lazy[l] += lazy[id];
-                lazy[r] += lazy[id];
-                upd[l]=upd[r]=1;
-            }
-            lazy[id] = 0;
-            upd[id]=0; 
+       void push(int id, int ns, int ne) {
+        if (lazy[id] == 0) return;  
+        
+        if (ns != ne) {
+            int l = id * 2 + 1;
+            int r = id * 2 + 2;
+            
+            int mid = (ns + ne) / 2;
+            int llen = mid - ns + 1;
+            int rlen = ne - (mid);
+
+            lazy[l] += lazy[id];
+            lazy[r] += lazy[id];
+            tree[l] += llen*lazy[id];
+            tree[r] += rlen*lazy[id];
+               
         }
+        lazy[id] = 0;
     }
 
-    ll get(int qs, int qe,int id,int ns, int ne){
-        unlazy(id,ns,ne);
-        if(qs > ne || qe < ns){ 
-            return 0; 
-        }
-        if(qs <= ns && qe >= ne){
-            return tree[id];
-        }
-        int mid=(ns+ne)/2;
-        int left=id*2+1;
-        int right=left+1;
-        ll l=get(qs,qe,left,ns,mid);
-        ll r=get(qs,qe,right,mid+1,ne);
-        return mrg(l, r);
+    ll query(int qs, int qe, int id, int ns, int ne) {
+        push(id, ns, ne);
+        if (qs > ne || qe < ns) return 0;
+        if (qs <= ns && ne <= qe) return tree[id];
+
+        int mid = (ns + ne) / 2;
+        ll L = query(qs, qe, id * 2 + 1, ns, mid);
+        ll R = query(qs, qe, id * 2 + 2, mid + 1, ne);
+        return mrg(L, R);
     }
-    void update(int qs,int qe, int val,int id, int ns,int ne ){
-        unlazy(id,ns,ne);
-        if (qs > ne || qe < ns) return;
+
+    void update(int qs, int qe, int val, int id, int ns, int ne) {
+        push(id, ns, ne);
+        if (qe < ns || qs > ne) return;
         if (qs <= ns && ne <= qe) {
-            lazy[id]+=val;
-            upd[id]=1;
-            unlazy(id,ns,ne);
+            apply_set(id, ns, ne, val);
             return;
         }
-        int mid=(ns+ne)/2;
-        int left=id*2+1;
-        int right=left+1;
-        update(qs,qe, val,left,ns,mid);
-        update(qs,qe,val,right,mid+1,ne);
         
-        tree[id]=mrg(tree[left], tree[right]);
+        int mid = (ns + ne) / 2;
+        update(qs, qe, val, id * 2 + 1, ns, mid);
+        update(qs, qe, val, id * 2 + 2, mid + 1, ne);
+        tree[id] = mrg(tree[id * 2 + 1], tree[id * 2 + 2]);
     }
+    
+    void apply_set(int id, int ns, int ne, int val) {
+        int len = ne - ns + 1;
+        
+        tree[id] += 1ll*len*val;
+        
+        lazy[id] += (ll)val;
+    }
+
+ 
+    
 };
 
 void solve() {
     int n, c;
     scanf("%d %d", &n, &c);
-    SegTree seg = SegTree(n);
+    vector<int>v(n,0);
+    SegTree seg = SegTree(v);
 
     for (int i = 0; i < c; i++) {
         int t, p, q, v;
@@ -88,7 +96,7 @@ void solve() {
         } else {
             scanf("%d %d", &p, &q);
             p--, q--;
-            printf("%lld\n", seg.get(p, q, 0, 0, n - 1));
+            printf("%lld\n", seg.query(p, q, 0, 0, n - 1));
         }
     }
 }
