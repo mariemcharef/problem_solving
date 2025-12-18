@@ -9,86 +9,69 @@ typedef __gnu_pbds::tree<int, __gnu_pbds::null_type, less<int>, __gnu_pbds::rb_t
 
 typedef long long ll;
 
+void solve()
+{
+    int n, m;
+    cin >> n >> m;
 
-void solve() {
-    ll t,n,c,d,x,m;
-    cin>>n>>m;
-    vector<ll> a(n),b(m);
-    vector<ll> p(m),s(m);
-    for(int i=0;i<n;i++){
-        cin>>a[i];
-    }  
-    for(int i=0;i<m;i++){
-        cin>>b[i];
-    } 
-    int j=0;
-    for(int i=0;i<m;i++){
-        while(j<n && a[j]<b[i]){
+    vector<int> a(n), b(m), pref(n, -1), suf(n, -1);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    for (int i = 0; i < m; i++) cin >> b[i];
+
+    int j = -1;
+    for (int i = 0; i < n; i++) {
+        if (j + 1 < m && a[i] >= b[j + 1]) {
             j++;
         }
-        p[i]=j;
-        j++;
+        pref[i] = j;
     }
-    j=n-1;
-    for(int i=m-1;i>=0;i--){
-        while(j>=0 && a[j]<b[i]){
+
+    if (j == m - 1) {
+        cout << 0 << "\n";
+        return;
+    }
+
+
+    j = m;
+    for (int i = n - 1; i >= 0; i--) {
+        if (j - 1 >= 0 && a[i] >= b[j - 1]) {
             j--;
         }
-        s[i]=j;
-        j--;
+        suf[i] = j;
     }
 
-    if(s[0]>=0){
-        cout<<0<<endl;
-        return;
-    }
-    set<int> ans;
-    for(int i=0;i<m;i++){
-        if(i==0 && s[1]>=0){
-            ans.insert(i);
-        }
-        else if(i==m-1 && p[m-1]<=n){
-            ans.insert(i);
-        }else if(i>0 && i<m-1 && p[i-1]<s[i+1]){
-            ans.insert(i);
-        }
-    }
-    if(ans.size()==0){
-        cout<<-1<<endl;
-        return;
-    }
-    int answer=b[*(ans.begin())];
+    long long ans = 1e18;
 
-    int indice_as8er_wahda=0;
-    for(int i:ans){
+    if (suf[0] == 1)
+        ans = min(ans, (long long)b[0]);
 
-        if(b[i]<answer){
-            indice_as8er_wahda=i;
-            answer=b[i];
+    if (pref[n - 1] == m - 2)
+        ans = min(ans, (long long)b[m - 1]);
+
+    for (int i = 1; i < n; i++) {
+        if (suf[i] - pref[i - 1] == 2) {
+            ans = min(ans, (long long)b[pref[i - 1] + 1]);
         }
     }
 
-    j=0;
-    for(int i=0;i<m;i++){
-        if(i==indice_as8er_wahda)continue;
-        while(j<n && a[j]<b[i]){
-            j++;
+    if (ans == 1e18)
+        cout << -1 << "\n";
+    else
+        cout << ans << "\n";
+}
+  
+
+
+    int main()
+    {
+        
+        int tc=1;
+        cin>>tc;
+        while(tc--)
+        {
+            solve();
         }
+           
+            
         
     }
-    
-
-    cout<<answer<<endl;
-
-
-    
-}
-
-int main() {
-    ios_base::sync_with_stdio(false);
-    cin.tie(nullptr);
-    int t = 1;
-    cin >> t;
-    while (t--) solve();
-    return 0;
-}
