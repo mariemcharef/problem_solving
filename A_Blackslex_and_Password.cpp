@@ -6,7 +6,8 @@ using namespace std;
 void solve() {
     int n, x,k;
     cin>>k>>x;
-    cout<<k*x+1<<endl;
+    cout<<k*x+1;
+    cout<<endl;
 
 
 
